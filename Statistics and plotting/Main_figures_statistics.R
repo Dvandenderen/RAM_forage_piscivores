@@ -57,7 +57,7 @@
   for (j in 1:length(stid)){
     stock<-subset(finaldata,finaldata$stocklong == stid[j]) ### select the predator 1:32
     
-    # only plot if data for > 20 
+    # only run if data for > 20 
     if(length(stock$year) > 20){
     
       # add smoother for illustration
@@ -119,7 +119,10 @@
   }
 
 # fit the interaction model
-  mod1<-(lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall))
+  mod  <- lm(log(ratiodif)~(ERpred)+(ERprey),data=stockall)
+  mod1 <- lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall)
+  mod2 <- lm(log(ratiodif)~(ERpred),data=stockall)
+  #AICtab(mod,mod1,mod2)
   
 # cooks distance plot
   pdf("Cook distance plot.pdf",width=5,height=4.5)
@@ -136,32 +139,31 @@
   mod  <- lm(log(ratiodif)~(ERpred)+(ERprey),data=stockall)
   mod1 <- lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall)
   mod2 <- lm(log(ratiodif)~(ERpred),data=stockall)
-  AICtab(mod,mod1,mod2)
+  #AICtab(mod,mod1,mod2)
 
 # make figure contour
-  pdf("Contour plot.pdf",width=5.5,height=4)
+  pdf("Contour plot.pdf",width=8,height=5)
   ERpred<-seq(0.023,0.46,0.001)
   ERprey<-seq(0.078,0.268,0.001)
   tabz<-merge(ERpred,ERprey)
   pred <-data.frame(tabz)
   colnames(pred)<-c("ERpred","ERprey")
   pred$fit <-predict(mod1,newdata=pred,type="response")
+  pred$Biomass_ratio <- exp(pred$fit)
   
   library(ggplot2)
   cont<-ggplot(pred) + 
-    aes(x = ERpred, y = ERprey, z = exp(fit), fill = exp(fit)) + 
+    aes(x = ERpred, y = ERprey, z = Biomass_ratio, fill = Biomass_ratio) + 
     geom_tile() +
     scale_x_continuous(expand=c(0,0)) + 
-    scale_y_continuous(expand=c(0,0))+
-    #coord_equal() +
+    scale_y_continuous(expand=c(0,0)) +
     stat_contour(breaks=c(0.15,0.2,0.3,0.4,0.6),col="white")+
-    #stat_contour(breaks=c(0.3),col="white")+
     scale_fill_gradientn(colours=c("#2066ac", "#cde3ef","#f9c1a5","#de725a","#d05647","#b2182b"))+
     theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
             panel.background = element_blank(), axis.line = element_line(colour = "black"),
             panel.border = element_rect(colour = "black", fill=NA, size=0.5),
             axis.text=element_text(size=15),axis.title=element_text(size=15)) +
-            labs( x = "ER piscivore",y = "ER forage fish")
+            labs( x = "Piscivore fishing mortality",y = "Forage-fish fishing mortality")
   
   new <- data.frame(test1= stockall$ERpred, test2= stockall$ERprey)
   
