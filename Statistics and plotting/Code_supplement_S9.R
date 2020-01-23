@@ -72,15 +72,17 @@
       stockall$ERprey[j]<-mean(stock$ER_prey[(yr):(yrend)])
     }
     
-    stockall <- stockall[-6,] # remove blue whiting Chile -- outlier
+    # remove blue whiting Chile -- outlier
+    stockall <- stockall[-6,] 
     
     Int    <-lm(log(ratiodif)~(ERpred)+(ERprey),data=stockall)
     Full  <-(lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall))
     Simple <-lm(log(ratiodif)~(ERpred),data=stockall)
     
     # use r.squared or adj.r.squared
-    dat <- matrix(data=c(summary(Int)$r.squared,summary(Full)$r.squared,summary(Simple)$r.squared),
-                  ncol=3,nrow=1)
+    dat <- matrix(data=c(summary(Int)$r.squared,summary(Int)$adj.r.squared,
+                         summary(Full)$r.squared,summary(Full)$adj.r.squared,
+                         summary(Simple)$r.squared,summary(Simple)$adj.r.squared),ncol=3,nrow=2)
     colnames(dat) <- c("Int","Full","Simple")
     
     datAIC <-  as.data.frame(AIC(Int,Full,Simple)) 
