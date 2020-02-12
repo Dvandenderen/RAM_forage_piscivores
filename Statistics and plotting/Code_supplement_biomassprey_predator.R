@@ -73,7 +73,7 @@
   setwd("C:/Users/pdvd/Online for git/RAM_forage_piscivores/Output")
   pdf("Biomass_predator_prey.pdf",width=5,height=4.5)
   plot(log10(stockall$Biopred)~log10(stockall$Bioprey),xlim = c(3,7.5),ylim=c(3,7.5),xaxt="n",yaxt="n",
-       xlab="Average biomass prey (metric tons)", ylab="Average biomass predator (metric tons)")
+       xlab="Average biomass forage fish (metric tons)", ylab="Average biomass piscivore (metric tons)")
   axis(1,c(3,5,7),c(TeX("10$^3$"),TeX("10$^5$"),TeX("10$^7$")))
   axis(2,c(3,5,7),c(TeX("10$^3$"),TeX("10$^5$"),TeX("10$^7$")),las=1)
   lines(x=c(0,10),y=c(0,10),lwd=1, lty=3)  
