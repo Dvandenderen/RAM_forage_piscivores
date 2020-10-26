@@ -1,6 +1,5 @@
 
-#### code to produce: main manuscript data figure + table; 
-#### appendix cook distance, appendix time series fish predators
+#### code to produce: analysis without the old stock assessment data
 ##########################################################################
   
   setwd("C:/Users/pdvd/Online for git/RAM_forage_piscivores/Processing/")
@@ -12,8 +11,6 @@
 # include smoother for illustration
 # select the years with the largest decline in biomass 
 
-  setwd("C:/Users/pdvd/Online for git/RAM_forage_piscivores/Output/")
-  pdf("Timeseries_predators.pdf",width=8.3,height=11.27)
   par(mfrow=c(4,4))
 
 # get predators
@@ -98,8 +95,6 @@
       stockall[j,5]<-as.character(stock$stockid_prey[1])
     }}
   
-  dev.off()
-  
 # data for all stocks, remove two predators that are increasing  
   stockall<-cbind(c(1:32),stockall)
   stockall<-stockall[complete.cases(stockall[,2:3]),]
@@ -118,55 +113,18 @@
     stockall$ERprey[j]<-mean(stock$ER_prey[(yr):(yrend)])
   }
 
-# fit the interaction model
-  mod  <- lm(log(ratiodif)~(ERpred)+(ERprey),data=stockall)
-  mod1 <- lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall)
-  mod2 <- lm(log(ratiodif)~(ERpred),data=stockall)
-  #AICtab(mod,mod1,mod2)
-  
-# cooks distance plot
-  pdf("Cook distance plot.pdf",width=5,height=4.5)
-  barplot(sort(cooks.distance(mod1)),xaxt="n",xlab="Data points (stocks)",ylab="Cook's distance",
-          ylim=c(0,1.2),yaxt="n")
-  axis(2,c(0,0.6,1.2),las=1)
-  box()
-  dev.off()
-
 # remove blue whiting Chile -- outlier
   stockall <- stockall[-6,] 
+
+# remove older data declines (three species)
+  stockall <- stockall[-c(1,14,20),] 
+  
+# remove older data declines (four species, how are they selected?)
+  stockall <- stockall[-c(1,14,18,22),] 
   
 # check the three models (table main document)
   mod  <- lm(log(ratiodif)~(ERpred)+(ERprey),data=stockall)
   mod1 <- lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall)
   mod2 <- lm(log(ratiodif)~(ERpred),data=stockall)
-  #AICtab(mod,mod1,mod2)
+  AICtab(mod,mod1,mod2)
 
-# make figure contour
-  pdf("Contour plot.pdf",width=8,height=5)
-  ERpred<-seq(0.023,0.46,0.001)
-  ERprey<-seq(0.078,0.268,0.001)
-  tabz<-merge(ERpred,ERprey)
-  pred <-data.frame(tabz)
-  colnames(pred)<-c("ERpred","ERprey")
-  pred$fit <-predict(mod1,newdata=pred,type="response")
-  pred$Biomass_ratio <- exp(pred$fit)
-  
-  library(ggplot2)
-  cont<-ggplot(pred) + 
-    aes(x = ERpred, y = ERprey, z = Biomass_ratio, fill = Biomass_ratio) + 
-    geom_tile() +
-    scale_x_continuous(expand=c(0,0)) + 
-    scale_y_continuous(expand=c(0,0)) +
-    stat_contour(breaks=c(0.15,0.2,0.3,0.4,0.6),col="white")+
-    scale_fill_gradientn(colours=c("#2066ac", "#cde3ef","#f9c1a5","#de725a","#d05647","#b2182b"))+
-    theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-            panel.background = element_blank(), axis.line = element_line(colour = "black"),
-            panel.border = element_rect(colour = "black", fill=NA, size=0.5),
-            axis.text=element_text(size=15),axis.title=element_text(size=15)) +
-            labs( x = "Piscivore fishing mortality",y = "Forage-fish fishing mortality")
-  
-  new <- data.frame(test1= stockall$ERpred, test2= stockall$ERprey)
-  
-  cont+ geom_point(data=new, aes(x=test1, y=test2 ,fill=NULL, z=NULL),colour="black") 
-
-  dev.off()
