@@ -116,13 +116,15 @@
 # remove blue whiting Chile -- outlier
   stockall <- stockall[-6,] 
 
-# remove older data declines (three species)
+# run one of the lines below::::
+
+# S11 - data declines early in the time period (four species)
+  stockall <- stockall[-c(1,14,18,22),] 
+
+# S12 data declines before 1970 (three species)
   stockall <- stockall[-c(1,14,20),] 
   
-# remove older data declines (four species, how are they selected?)
-  stockall <- stockall[-c(1,14,18,22),] 
-  
-# check the three models (table main document)
+# check the three models
   mod  <- lm(log(ratiodif)~(ERpred)+(ERprey),data=stockall)
   mod1 <- lm(log(ratiodif)~(ERpred)*(ERprey),data=stockall)
   mod2 <- lm(log(ratiodif)~(ERpred),data=stockall)
