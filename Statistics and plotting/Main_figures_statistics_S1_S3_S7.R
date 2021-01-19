@@ -6,7 +6,8 @@
   setwd("C:/Users/pdvd/Online for git/RAM_forage_piscivores/Processing/")
   source("Process_timeseries_ER.R")
   library(nlme)
-  library(bbmle)  
+  library(bbmle)
+  library(latex2exp)
 
 # make a time-series plot for each predator
 # include smoother for illustration
@@ -142,7 +143,7 @@
   #AICtab(mod,mod1,mod2)
 
 # make figure contour
-  pdf("Contour plot.pdf",width=8,height=5)
+  pdf("Contour plot.pdf",width=7,height=4.5)
   ERpred<-seq(0.023,0.46,0.001)
   ERprey<-seq(0.078,0.268,0.001)
   tabz<-merge(ERpred,ERprey)
@@ -163,10 +164,21 @@
             panel.background = element_blank(), axis.line = element_line(colour = "black"),
             panel.border = element_rect(colour = "black", fill=NA, size=0.5),
             axis.text=element_text(size=15),axis.title=element_text(size=15)) +
-            labs( x = "Piscivore fishing mortality",y = "Forage-fish fishing mortality")
+            labs( x = TeX("Piscivore fishing mortality $\\M_{pi}$"),
+                  y = TeX("Forage-fish fishing mortality $\\M_{ff}$"))
+  cont <- cont + labs(fill= "Biomass \n decline")
   
-  new <- data.frame(test1= stockall$ERpred, test2= stockall$ERprey)
-  
-  cont+ geom_point(data=new, aes(x=test1, y=test2 ,fill=NULL, z=NULL),colour="black") 
+  new  <- data.frame(test1= stockall$ERpred, test2= stockall$ERprey)
+  cont <- cont + geom_point(data=new, aes(x=test1, y=test2 ,fill=NULL, z=NULL),colour="black") 
 
+  cont + annotate("text", x=0.06, y=0.25, label= "0.15", col="white") +
+         annotate("text", x=0.06, y=0.205, label= "0.2", col="white") +
+    annotate("text", x=0.4, y=0.26, label= "0.4", col="white") +
+    annotate("text", x=0.35, y=0.23, label= "0.3", col="white") +
+    annotate("text", x=0.41, y=0.1, label= "0.15", col="white") +
+    annotate("text", x=0.4, y=0.142, label= "0.2", col="white") +
+    annotate("text", x=0.1, y=0.1, label= "0.6", col="white") +
+    annotate("text", x=0.1, y=0.145, label= "0.4", col="white") +
+    annotate("text", x=0.14, y=0.175, label= "0.3", col="white")
+    
   dev.off()
